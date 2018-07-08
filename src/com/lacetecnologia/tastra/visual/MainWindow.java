@@ -141,7 +141,7 @@ public class MainWindow extends JFrame implements ActionListener{
                     if(JOptionPane.showConfirmDialog(this,"Do you had finished this activity?")== 0){//yes   
                         
                         m = new Move(MoveType.STOP);
-                        msg = "Stop registred";
+                        msg = "Stop registred on "+FileManager.getPath();
                         toSave = true;
                         
                         stop.setEnabled(false);
@@ -160,7 +160,7 @@ public class MainWindow extends JFrame implements ActionListener{
                     break;
                 case "play":             
                     m = new Move(MoveType.START);
-                    msg = "Start registred";
+                    msg = "Start registred on "+FileManager.getPath();
                     toSave = true;
                    
                     stop.setEnabled(true);
@@ -174,7 +174,7 @@ public class MainWindow extends JFrame implements ActionListener{
                 case "pause":
                     toSave =true;
                     m = new Move(MoveType.PAUSE);
-                    msg = "Stop registred";
+                    msg = "Stop registred on "+FileManager.getPath();
                     
                     stop.setEnabled(false);
                     pause.setEnabled(false);
