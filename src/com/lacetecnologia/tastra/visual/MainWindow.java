@@ -66,7 +66,7 @@ public class MainWindow extends JFrame implements ActionListener{
        JPanel painel = new JPanel();
        
        JPanel superior = new JPanel();
-       lblAtividade = new JLabel("Atividade:");
+       lblAtividade = new JLabel("Activity:");
        txtNroAtividade = new JTextField(10);
        txtAtividadeNome = new JTextField(50);
        lblTimeSpended = new JLabel("");
