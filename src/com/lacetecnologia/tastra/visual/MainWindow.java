@@ -25,6 +25,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.Timer;
+import java.awt.GridLayout;
 
 /**
  *
@@ -43,6 +44,7 @@ public class MainWindow extends JFrame implements ActionListener{
     private int seconds;
     private boolean countingTime;
     private String timeSpended;
+    private Timer hourTimer;
     
 
     public MainWindow(){
@@ -120,8 +122,69 @@ public class MainWindow extends JFrame implements ActionListener{
       painel.add(superior);
       painel.add(inferior);
       painel.add(superInferior);
-      
+
        return painel;
+    }
+
+    private void startHourTimer(){
+        if(hourTimer != null && hourTimer.isRunning()){
+            hourTimer.stop();
+        }
+        hourTimer = new Timer(3600000, this);
+        hourTimer.setRepeats(false);
+        hourTimer.setActionCommand("hourCheck");
+        hourTimer.start();
+    }
+
+    private void stopHourTimer(){
+        if(hourTimer != null){
+            hourTimer.stop();
+        }
+    }
+
+    private void finalizeFromPopup(){
+        int number = Integer.parseInt(this.txtNroAtividade.getText());
+        String desc = this.txtAtividadeNome.getText();
+
+        Move m = new Move(MoveType.STOP);
+        Activitys.getInstance().addActivity(new ActivityTraking(number, desc));
+        Activitys.getInstance().addMoveToActivity(number, m);
+        ActivityTraking at = Activitys.getInstance().getActivity(number);
+        FileManager.saveActivity(at, m, timeSpended);
+
+        stop.setEnabled(false);
+        pause.setEnabled(false);
+        play.setEnabled(true);
+        txtAtividadeNome.setEnabled(true);
+        txtNroAtividade.setEnabled(true);
+        countingTime = false;
+        minutes = 0;
+        seconds = 0;
+        status.setText("Stop registred on " + FileManager.getPath());
+        stopHourTimer();
+
+        txtAtividadeNome.setText("");
+        txtNroAtividade.setText("");
+
+        showNextActivityDialog();
+    }
+
+    private void showNextActivityDialog(){
+        JPanel panel = new JPanel(new GridLayout(2,2));
+        JTextField numberField = new JTextField();
+        JTextField nameField = new JTextField();
+        panel.add(new JLabel("Number:"));
+        panel.add(numberField);
+        panel.add(new JLabel("Name:"));
+        panel.add(nameField);
+
+        int res = JOptionPane.showConfirmDialog(null, panel, "Next Activity", JOptionPane.OK_CANCEL_OPTION);
+        if(res == JOptionPane.OK_OPTION){
+            txtNroAtividade.setText(numberField.getText());
+            txtAtividadeNome.setText(nameField.getText());
+            ActionEvent playEvent = new ActionEvent(play, ActionEvent.ACTION_PERFORMED, "play");
+            actionPerformed(playEvent);
+        }
     }
 
     @Override
@@ -138,8 +201,8 @@ public class MainWindow extends JFrame implements ActionListener{
             
             switch(e.getActionCommand()){
                 case "stop":
-                    if(JOptionPane.showConfirmDialog(this,"Do you had finished this activity?")== 0){//yes   
-                        
+                    if(JOptionPane.showConfirmDialog(this,"Do you had finished this activity?")== 0){//yes
+
                         m = new Move(MoveType.STOP);
                         msg = "Stop registred on "+FileManager.getPath();
                         toSave = true;
@@ -152,13 +215,15 @@ public class MainWindow extends JFrame implements ActionListener{
                         countingTime = false;
                         minutes=0;
                         seconds=0;
-                        
-                        
+
+                        stopHourTimer();
+
+
                         txtAtividadeNome.setText("");
                         txtNroAtividade.setText("");
                     }
                     break;
-                case "play":             
+                case "play":
                     m = new Move(MoveType.START);
                     msg = "Start registred on "+FileManager.getPath();
                     toSave = true;
@@ -169,7 +234,8 @@ public class MainWindow extends JFrame implements ActionListener{
                     txtAtividadeNome.setEnabled(false);
                     txtNroAtividade.setEnabled(false);
                     countingTime = true;
-                    
+                    startHourTimer();
+
                     break;
                 case "pause":
                     toSave =true;
@@ -180,8 +246,9 @@ public class MainWindow extends JFrame implements ActionListener{
                     pause.setEnabled(false);
                     play.setEnabled(true);
                     countingTime = false;
-                    
-                    
+                    stopHourTimer();
+
+
                     break;
                 case "refresh":
                     if(countingTime){
@@ -193,6 +260,22 @@ public class MainWindow extends JFrame implements ActionListener{
                         
                         timeSpended = String.format("%02d", minutes) + ":" + String.format("%02d", seconds) + " spended";
                         lblTimeSpended.setText(timeSpended);
+                    }
+                    break;
+                case "hourCheck":
+                    Object[] options = {"Continuar", "Finalizada"};
+                    int resp = JOptionPane.showOptionDialog(null,
+                            "A atividade " + desc + " foi finalizada?",
+                            "Hora trabalhada",
+                            JOptionPane.DEFAULT_OPTION,
+                            JOptionPane.QUESTION_MESSAGE,
+                            null,
+                            options,
+                            options[0]);
+                    if(resp == 1){
+                        finalizeFromPopup();
+                    }else{
+                        startHourTimer();
                     }
                     break;
             }
