@@ -45,7 +45,13 @@ public class Activitys {
     }
     
     public void addMoveToActivity(String id,Move m){
+        if (id == null || id.trim().isEmpty()) {
+            throw new IllegalArgumentException("Activity id must not be null or empty");
+        }
         ActivityTraking a = getActivity(id);
+        if (a == null) {
+            throw new IllegalArgumentException("Activity not found for id: " + id);
+        }
         a.addMove(m);
     }
     
