@@ -73,7 +73,7 @@ public class FileManager {
         if(!dirTrack.exists()){
            dirTrack.mkdir(); 
         }
-        return logPath + "LogActivites_"+sdf.format(d)+".log";
+        return logPath + "LogActivities_"+sdf.format(d)+".log";
     }
 
     public static String getLogPath(){
