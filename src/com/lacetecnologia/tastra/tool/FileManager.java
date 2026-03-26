@@ -70,8 +70,12 @@ public class FileManager {
         logPath += SYSTEM_PATH+File.separator+"logs"+File.separator;
         System.out.println("(3)"+logPath);
         File dirTrack = new File(logPath);
-        if(!dirTrack.exists()){
-           dirTrack.mkdir(); 
+        if (!dirTrack.exists()) {
+            boolean created = dirTrack.mkdirs();
+            if (!created && !dirTrack.exists()) {
+                Logger.getLogger(FileManager.class.getName()).log(Level.SEVERE, "Failed to create log directory: " + logPath);
+                System.exit(0);
+            }
         }
         return logPath + "LogActivities_"+sdf.format(d)+".log";
     }
