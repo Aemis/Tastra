@@ -59,6 +59,10 @@ public class TrayIconTasTra implements ActionListener{
             SystemTray tray = SystemTray.getSystemTray();
 
             TrayIcon trayIcon = getTrayIcon();
+            if (trayIcon == null) {
+                Logger.getLogger(TrayIconTasTra.class.getName()).log(Level.SEVERE, "Failed to create tray icon.");
+                return;
+            }
             tray.add(trayIcon);
 
             MenuItem menu = new MenuItem("Exit");
