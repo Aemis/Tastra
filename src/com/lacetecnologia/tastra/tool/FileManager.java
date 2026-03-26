@@ -38,23 +38,21 @@ public class FileManager {
     private static String logPath;
 
     private static String getSystemPath() {
-        if(SYSTEM_PATH == null || SYSTEM_PATH.isEmpty()) {
-            String mySystemPath = "" ;
-            try {
-                mySystemPath = System.getProperty("user.dir");
-                File filePath = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+        String mySystemPath = System.getProperty("user.dir");
+        try {
+            File filePath = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI());
 
-                System.out.println("(1)"+filePath);
-                System.out.println("(2)"+mySystemPath);
+            System.out.println("(1)" + filePath);
+            System.out.println("(2)" + mySystemPath);
 
-                mySystemPath = filePath.getAbsolutePath();
-
-            } catch (URISyntaxException ex) {
-                Logger.getLogger(FileManager.class.getName()).log(Level.SEVERE, null, ex);
+            File parent = filePath.getParentFile();
+            if (parent != null) {
+                mySystemPath = parent.getAbsolutePath();
             }
-            return mySystemPath;
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(FileManager.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return SYSTEM_PATH;
+        return mySystemPath;
     }
     
     public static void saveActivity(ActivityTraking a,Move m,String addText){
