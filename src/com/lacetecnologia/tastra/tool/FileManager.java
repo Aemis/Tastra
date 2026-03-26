@@ -34,30 +34,52 @@ import java.util.logging.Logger;
  * @author Leticia
  */
 public class FileManager {
-    private static String path;
+    private static final String SYSTEM_PATH = getSystemPath();
+    private static String logPath;
+
+    private static String getSystemPath() {
+        String mySystemPath = System.getProperty("user.dir");
+        try {
+            File filePath = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+
+            System.out.println("(1)" + filePath);
+            System.out.println("(2)" + mySystemPath);
+
+            File parent = filePath.getParentFile();
+            if (parent != null) {
+                mySystemPath = parent.getAbsolutePath();
+            }
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(FileManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return mySystemPath;
+    }
     
     public static void saveActivity(ActivityTraking a,Move m,String addText){
         String filename = createFilename();
         createFile(filename,a,m,addText);
+        //TODO Integrações
     }
 
     private static String createFilename() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         Date d = new Date();
-        //creating log directory
-        path = System.getProperty("user.dir");
-        try {
-            File filePath = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-            path = filePath.getPath().replace(filePath.getName(), "");
-        } catch (URISyntaxException ex) {
-            Logger.getLogger(FileManager.class.getName()).log(Level.SEVERE, null, ex);
+        logPath = "";
+        logPath += SYSTEM_PATH+File.separator+"logs"+File.separator;
+        System.out.println("(3)"+logPath);
+        File dirTrack = new File(logPath);
+        if (!dirTrack.exists()) {
+            boolean created = dirTrack.mkdirs();
+            if (!created && !dirTrack.exists()) {
+                Logger.getLogger(FileManager.class.getName()).log(Level.SEVERE, "Failed to create log directory: " + logPath);
+                System.exit(0);
+            }
         }
-        path += "\\tracking\\";
-        File dirTrack = new File(path);
-        if(!dirTrack.exists()){
-           dirTrack.mkdir(); 
-        }
-        return path + "Log_"+sdf.format(d)+".log";
+        return logPath + "LogActivities_"+sdf.format(d)+".log";
+    }
+
+    public static String getLogPath(){
+        return logPath;
     }
 
     private static void createFile(String filename, ActivityTraking a, Move m,String addText) {
@@ -65,33 +87,38 @@ public class FileManager {
     }
 
     private static  void createANewFile(String filename,ActivityTraking a, Move m,String addText) {
+        System.out.println("[m=createANewFile] Starting creating a new file with filename ="+ filename);
+        try {
+            File fileTest = new File(filename);
+            if (fileTest.exists()) {
+                try {
+                    BufferedWriter bw = new BufferedWriter(new FileWriter(filename, true));
+                    bw.write(gerarRegistroMovimento(a, m, addText));
+                    bw.close();
 
-        File fileTest = new File(filename);
-        if(fileTest.exists()){
-            try{
-                BufferedWriter bw = new BufferedWriter(new FileWriter(filename,true));
-                bw.write(gerarRegistroMovimento(a,m,addText));
-                bw.close();
-
-            } catch (IOException ex) {
-                Logger.getLogger(FileManager.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(FileManager.class.getName()).log(Level.SEVERE, null, ex);
+                    System.exit(0);
+                }
+            } else {
+                try {
+                    fileTest.createNewFile();
+                } catch (IOException ex) {
+                    Logger.getLogger(FileManager.class.getName()).log(Level.SEVERE, null, ex);
+                    System.exit(0);
+                }
+                createANewFile(filename, a, m, addText);
             }
-        }else{
-            try {
-                fileTest.createNewFile();
-            } catch (IOException ex) {
-                Logger.getLogger(FileManager.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            createANewFile(filename,a,m,addText);
-        };
+        }catch (Exception e){
+            System.out.println("ERRO!"+e.getLocalizedMessage());
+            System.exit(0);
+        }
     }
 
     private static String gerarRegistroMovimento(ActivityTraking a, Move m,String addText) {
         SimpleDateFormat sdf = new SimpleDateFormat("[dd/MM/yyyy HH:mm:ss] ");
-        return sdf.format(m.getTimestamp()) + a.getNumber()+" - "+a.getName() +": "+ m.getType()+ " "+ addText+ "\n";
+        return sdf.format(m.getTimestamp()) + a.getId()+" - "+a.getName() +": "+ m.getType()+ " "+ addText+ "\n";
     }
-    
-    public static String getPath(){
-        return path;
-    }
+
+
 }
