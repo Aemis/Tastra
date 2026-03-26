@@ -7,6 +7,7 @@ public class Configuration {
 
     public Configuration(ConfigKey key, String value) {
         this.key = key;
+        this.value = value;
     }
 
     public ConfigKey getKey() {
