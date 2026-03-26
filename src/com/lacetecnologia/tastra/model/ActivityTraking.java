@@ -15,22 +15,22 @@ import java.util.List;
  * @author Leticia
  */
 public class ActivityTraking {
-    private int number;
+    private String id;
     private String name;
     private List<Move> moves;
     
-    public ActivityTraking(int number,String name){
-        this.number = number;
+    public ActivityTraking(String id,String name){
+        this.id = id;
         this.name = name;
         moves = new ArrayList<Move>();
     }
 
-    public int getNumber() {
-        return number;
+    public String getId() {
+        return id;
     }
 
-    public void setNumber(int number) {
-        this.number = number;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -55,7 +55,7 @@ public class ActivityTraking {
     }
     
     public String toString(){
-        return number + " - " + name +"\n"+ getListMoves();
+        return id + " - " + name +"\n"+ getListMoves();
     }
 
     public List<Move> getMoves() {

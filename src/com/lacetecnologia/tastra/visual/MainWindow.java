@@ -143,13 +143,13 @@ public class MainWindow extends JFrame implements ActionListener{
     }
 
     private void finalizeFromPopup(){
-        int number = Integer.parseInt(this.txtNroAtividade.getText());
+        String id = this.txtNroAtividade.getText();
         String desc = this.txtAtividadeNome.getText();
 
         Move m = new Move(MoveType.STOP);
-        Activitys.getInstance().addActivity(new ActivityTraking(number, desc));
-        Activitys.getInstance().addMoveToActivity(number, m);
-        ActivityTraking at = Activitys.getInstance().getActivity(number);
+        Activitys.getInstance().addActivity(new ActivityTraking(id, desc));
+        Activitys.getInstance().addMoveToActivity(id, m);
+        ActivityTraking at = Activitys.getInstance().getActivity(id);
         FileManager.saveActivity(at, m, timeSpended);
 
         stop.setEnabled(false);
@@ -160,7 +160,7 @@ public class MainWindow extends JFrame implements ActionListener{
         countingTime = false;
         minutes = 0;
         seconds = 0;
-        status.setText("Stop registred on " + FileManager.getPath());
+        status.setText("Stop registred on " + FileManager.getLogPath());
         stopHourTimer();
 
         txtAtividadeNome.setText("");
@@ -195,7 +195,7 @@ public class MainWindow extends JFrame implements ActionListener{
         }
         else{
             boolean toSave = false;
-            int number = Integer.parseInt(this.txtNroAtividade.getText());
+            String id = this.txtNroAtividade.getText();
             String desc = this.txtAtividadeNome.getText();
             Move m = null;
             
@@ -204,7 +204,7 @@ public class MainWindow extends JFrame implements ActionListener{
                     if(JOptionPane.showConfirmDialog(this,"Do you had finished this activity?")== 0){//yes
 
                         m = new Move(MoveType.STOP);
-                        msg = "Stop registred on "+FileManager.getPath();
+                        msg = "Stop registred on "+FileManager.getLogPath();
                         toSave = true;
                         
                         stop.setEnabled(false);
@@ -218,14 +218,13 @@ public class MainWindow extends JFrame implements ActionListener{
 
                         stopHourTimer();
 
-
                         txtAtividadeNome.setText("");
                         txtNroAtividade.setText("");
                     }
                     break;
                 case "play":
                     m = new Move(MoveType.START);
-                    msg = "Start registred on "+FileManager.getPath();
+                    msg = "Start registred on "+FileManager.getLogPath();
                     toSave = true;
                    
                     stop.setEnabled(true);
@@ -240,7 +239,7 @@ public class MainWindow extends JFrame implements ActionListener{
                 case "pause":
                     toSave =true;
                     m = new Move(MoveType.PAUSE);
-                    msg = "Stop registred on "+FileManager.getPath();
+                    msg = "Stop registred on "+FileManager.getLogPath();
                     
                     stop.setEnabled(false);
                     pause.setEnabled(false);
@@ -281,9 +280,9 @@ public class MainWindow extends JFrame implements ActionListener{
             }
             if(toSave){
                 //saving
-                Activitys.getInstance().addActivity(new ActivityTraking(number, desc));
-                Activitys.getInstance().addMoveToActivity(number, m);
-                ActivityTraking at = Activitys.getInstance().getActivity(number);
+                Activitys.getInstance().addActivity(new ActivityTraking(id, desc));
+                Activitys.getInstance().addMoveToActivity(id, m);
+                ActivityTraking at = Activitys.getInstance().getActivity(id);
                 FileManager.saveActivity(at,m,(m.getType() == MoveType.STOP)?timeSpended:"");
             }
         }
